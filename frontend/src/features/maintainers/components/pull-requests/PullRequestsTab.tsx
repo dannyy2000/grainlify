@@ -148,7 +148,7 @@ export function PullRequestsTab({ selectedProjects, onRefresh }: PullRequestsTab
   };
 
   return (
-    <div className={`backdrop-blur-[40px] rounded-[24px] border shadow-[0_8px_32px_rgba(0,0,0,0.08)] p-8 transition-colors ${
+    <div className={`backdrop-blur-[40px] rounded-[24px] border p-8 transition-colors ${
       theme === 'dark'
         ? 'bg-[#2d2820]/[0.4] border-white/10'
         : 'bg-white/[0.12] border-white/20'

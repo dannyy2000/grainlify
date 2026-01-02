@@ -300,7 +300,7 @@ export function DashboardTab({ selectedProjects, onRefresh }: DashboardTabProps)
       {/* Main Content: Last Activity & Applications History */}
       <div className="grid grid-cols-2 gap-6">
         {/* Last Activity */}
-        <div className={`backdrop-blur-[40px] rounded-[24px] border shadow-[0_8px_32px_rgba(0,0,0,0.08)] p-8 relative overflow-hidden group/activity transition-colors ${
+        <div className={`backdrop-blur-[40px] rounded-[24px] border p-8 relative overflow-hidden group/activity transition-colors ${
           theme === 'dark'
             ? 'bg-[#2d2820]/[0.4] border-white/10'
             : 'bg-white/[0.12] border-white/20'

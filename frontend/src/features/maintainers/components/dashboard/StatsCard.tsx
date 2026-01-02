@@ -16,7 +16,7 @@ export function StatsCard({ stat, index }: StatsCardProps) {
 
   return (
     <div
-      className={`backdrop-blur-[40px] rounded-[18px] border shadow-[0_8px_24px_rgba(0,0,0,0.08)] p-6 hover:scale-105 hover:shadow-[0_12px_36px_rgba(0,0,0,0.12)] transition-all duration-300 group relative overflow-hidden ${
+      className={`backdrop-blur-[40px] rounded-[18px] border p-6 hover:scale-105 transition-all duration-300 group relative overflow-hidden ${
         theme === 'dark'
           ? 'bg-[#2d2820]/[0.4] border-white/10 hover:bg-[#2d2820]/[0.5]'
           : 'bg-white/[0.15] border-white/25 hover:bg-white/[0.2]'
@@ -41,13 +41,13 @@ export function StatsCard({ stat, index }: StatsCardProps) {
         
         {/* Icon with trend indicator */}
         <div className="relative">
-          <div className="w-10 h-10 rounded-[12px] bg-gradient-to-br from-[#c9983a]/25 to-[#d4af37]/15 border border-[#c9983a]/30 flex items-center justify-center shadow-[0_4px_12px_rgba(201,152,58,0.15)] group-hover:scale-110 transition-transform">
+          <div className="w-10 h-10 rounded-[12px] bg-gradient-to-br from-[#c9983a]/25 to-[#d4af37]/15 border border-[#c9983a]/30 flex items-center justify-center group-hover:scale-110 transition-transform">
             <Icon className="w-5 h-5 text-[#c9983a]" />
           </div>
           
           {/* Trend Arrow */}
           {!isNeutral && (
-            <div className={`absolute -top-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center shadow-md ${
+            <div className={`absolute -top-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center ${
               isPositive ? 'bg-gradient-to-br from-[#4ade80] to-[#22c55e]' : 'bg-gradient-to-br from-[#f87171] to-[#ef4444]'
             }`}>
               {isPositive ? (
