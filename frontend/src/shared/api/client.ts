@@ -95,6 +95,16 @@ export const checkHealth = () =>
 export const checkReady = () => 
   apiRequest<{ ok: boolean; db: string }>('/ready');
 
+// Landing stats (public)
+export type LandingStats = {
+  active_projects: number;
+  contributors: number;
+  grants_distributed_usd: number;
+};
+
+export const getLandingStats = () =>
+  apiRequest<LandingStats>('/stats/landing');
+
 // Authentication
 export const getCurrentUser = () =>
   apiRequest<{ 

@@ -161,6 +161,10 @@ func New(cfg config.Config, deps Deps) *fiber.App {
 	leaderboard := handlers.NewLeaderboardHandler(deps.DB)
 	app.Get("/leaderboard", leaderboard.Leaderboard())
 
+	// Public landing stats
+	landingStats := handlers.NewLandingStatsHandler(deps.DB)
+	app.Get("/stats/landing", landingStats.Get())
+
 	// Public projects list with filtering
 	projectsPublic := handlers.NewProjectsPublicHandler(deps.DB)
 	app.Get("/projects", projectsPublic.List())

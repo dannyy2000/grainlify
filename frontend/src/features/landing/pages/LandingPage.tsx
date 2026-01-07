@@ -2,12 +2,14 @@ import { Navbar } from '../components/Navbar';
 import { Hero } from '../components/Hero';
 import { Code, GitBranch, Award, Shield, Zap, Users, TrendingUp, CheckCircle, Star, Quote } from 'lucide-react';
 import { useTheme } from '../../../shared/contexts/ThemeContext';
+import { useLandingStats } from '../../../shared/hooks/useLandingStats';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../shared/contexts/AuthContext';
 
 export function LandingPage() {
   const { theme } = useTheme();
+  const { display } = useLandingStats();
   const navigate = useNavigate();
   const { login } = useAuth();
   
@@ -275,8 +277,8 @@ function WhyChooseUs() {
               <div className="relative space-y-6">
                 {[
                   { icon: TrendingUp, label: 'Growing Ecosystem', value: '+45%' },
-                  { icon: Users, label: 'Active Users', value: '10K+' },
-                  { icon: Award, label: 'Projects Funded', value: '500+' },
+                  { icon: Users, label: 'Active Users', value: display.contributors },
+                  { icon: Award, label: 'Projects Funded', value: display.activeProjects },
                 ].map((item, index) => (
                   <div
                     key={index}

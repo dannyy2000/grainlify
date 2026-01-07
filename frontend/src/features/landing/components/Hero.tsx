@@ -1,9 +1,11 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight, Sparkles } from 'lucide-react';
 import { useTheme } from '../../../shared/contexts/ThemeContext';
+import { useLandingStats } from '../../../shared/hooks/useLandingStats';
 
 export function Hero() {
   const { theme } = useTheme();
+  const { display } = useLandingStats();
   
   return (
     <section className="relative min-h-screen flex items-center justify-center px-6 pt-20">
@@ -68,9 +70,9 @@ export function Hero() {
         {/* Stats */}
         <div className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
           {[
-            { label: 'Active Projects', value: '500+' },
-            { label: 'Contributors', value: '10K+' },
-            { label: 'Grants Distributed', value: '$2M+' },
+            { label: 'Active Projects', value: display.activeProjects },
+            { label: 'Contributors', value: display.contributors },
+            { label: 'Grants Distributed', value: display.grantsDistributed },
           ].map((stat) => (
             <div
               key={stat.label}

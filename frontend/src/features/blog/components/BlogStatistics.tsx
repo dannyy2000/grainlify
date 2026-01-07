@@ -1,12 +1,14 @@
 import { Users, Code, Globe } from 'lucide-react';
 import { useTheme } from '../../../shared/contexts/ThemeContext';
+import { useLandingStats } from '../../../shared/hooks/useLandingStats';
 
 export function BlogStatistics() {
   const { theme } = useTheme();
+  const { display } = useLandingStats();
 
   const stats = [
-    { icon: <Users className="w-6 h-6 text-white" />, value: '10,000+', label: 'Active Contributors' },
-    { icon: <Code className="w-6 h-6 text-white" />, value: '500+', label: 'Active Projects' },
+    { icon: <Users className="w-6 h-6 text-white" />, value: display.contributors, label: 'Active Contributors' },
+    { icon: <Code className="w-6 h-6 text-white" />, value: display.activeProjects, label: 'Active Projects' },
     { icon: <Globe className="w-6 h-6 text-white" />, value: '20+', label: 'Blockchain Ecosystems' },
   ];
 
