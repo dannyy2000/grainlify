@@ -603,6 +603,28 @@ export const getLeaderboard = (limit = 10, offset = 0) =>
     trendValue: number;
   }>>(`/leaderboard?limit=${limit}&offset=${offset}`);
 
+export const getProjectLeaderboard = (limit = 10, offset = 0, ecosystem?: string) => {
+  const params = new URLSearchParams();
+  params.append('limit', limit.toString());
+  params.append('offset', offset.toString());
+  if (ecosystem && ecosystem !== 'All Ecosystems') {
+    params.append('ecosystem', ecosystem);
+  }
+  return apiRequest<Array<{
+    rank: number;
+    name: string;
+    full_name: string;
+    logo: string;
+    score: number;
+    trend: 'up' | 'down' | 'same';
+    trendValue: number;
+    contributors: number;
+    ecosystems: string[];
+    activity: string;
+    project_id: string;
+  }>>(`/leaderboard/projects?${params.toString()}`);
+};
+
 // Admin Bootstrap
 export const bootstrapAdmin = (bootstrapToken: string) =>
   apiRequest<{

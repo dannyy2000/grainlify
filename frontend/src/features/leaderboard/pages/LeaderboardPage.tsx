@@ -1,7 +1,6 @@
-import { useState, useEffect } from 'react';
-import { LeaderboardType, FilterType, Petal, LeaderData } from '../types';
-import { projectsData } from '../data/leaderboardData';
-import { getLeaderboard } from '../../../shared/api/client';
+import React, { useState, useEffect } from 'react';
+import { LeaderboardType, FilterType, Petal, LeaderData, ProjectData } from '../types';
+import { getLeaderboard, getProjectLeaderboard } from '../../../shared/api/client';
 import { useTheme } from '../../../shared/contexts/ThemeContext';
 import { FallingPetals } from '../components/FallingPetals';
 import { LeaderboardTypeToggle } from '../components/LeaderboardTypeToggle';
@@ -14,6 +13,7 @@ import { ProjectsTable } from '../components/ProjectsTable';
 import { LeaderboardStyles } from '../components/LeaderboardStyles';
 import { ContributorsPodiumSkeleton } from '../components/ContributorsPodiumSkeleton';
 import { ContributorsTableSkeleton } from '../components/ContributorsTableSkeleton';
+import { ProjectsPodiumSkeleton } from '../components/ProjectsPodiumSkeleton';
 
 export function LeaderboardPage() {
   const { theme } = useTheme();
@@ -24,6 +24,7 @@ export function LeaderboardPage() {
   const [petals, setPetals] = useState<Petal[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
   const [leaderboardData, setLeaderboardData] = useState<LeaderData[]>([]);
+  const [projectsData, setProjectsData] = useState<ProjectData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [offset, setOffset] = useState(0);
   const [hasMore, setHasMore] = useState(true);
@@ -60,13 +61,40 @@ export function LeaderboardPage() {
           setIsLoading(false); // Set loading to false to show empty state instead of skeleton
         }
       } else {
-        // For projects, we don't fetch from API, so set loading to false
-        setIsLoading(false);
+        // For projects, fetch from API
+        setIsLoading(true);
+        setOffset(0); // Reset offset when switching types
+        try {
+          // Convert ecosystem name to slug (e.g., "Web3" -> "web3", "Developer Tools" -> "developer-tools")
+          let ecosystemFilter: string | undefined = undefined;
+          if (selectedEcosystem !== 'All Ecosystems') {
+            ecosystemFilter = selectedEcosystem.toLowerCase().replace(/\s+/g, '-');
+          }
+          const data = await getProjectLeaderboard(100, 0, ecosystemFilter);
+          // Transform API data to match ProjectData type
+          const transformedData: ProjectData[] = data.map((item) => ({
+            rank: item.rank,
+            name: item.name,
+            logo: item.logo,
+            score: item.score,
+            trend: item.trend,
+            trendValue: item.trendValue,
+            contributors: item.contributors,
+            ecosystems: item.ecosystems || [],
+            activity: item.activity,
+          }));
+          setProjectsData(transformedData);
+          setIsLoading(false);
+        } catch (err) {
+          console.error('Failed to fetch project leaderboard:', err);
+          setProjectsData([]);
+          setIsLoading(false); // Set loading to false to show empty state instead of skeleton
+        }
       }
     };
 
     fetchLeaderboard();
-  }, [leaderboardType]);
+  }, [leaderboardType, selectedEcosystem]);
 
   // Load more leaderboard data
   const loadMore = async () => {
@@ -149,7 +177,20 @@ export function LeaderboardPage() {
     })),
   ].slice(0, 3) as LeaderData[];
   
-  const projectTopThree = projectsData.slice(0, 3);
+  // Ensure we have at least 3 items for the project podium (pad with empty data if needed)
+  const projectTopThree: ProjectData[] = [
+    ...projectsData.slice(0, 3),
+    ...Array(Math.max(0, 3 - projectsData.length)).fill(null).map((_, i) => ({
+      rank: projectsData.length + i + 1,
+      name: '-',
+      logo: '📦',
+      score: 0,
+      trend: 'same' as const,
+      trendValue: 0,
+      contributors: 0,
+      ecosystems: [],
+    })),
+  ].slice(0, 3) as ProjectData[];
 
   return (
     <div className="space-y-6 relative">
@@ -185,8 +226,18 @@ export function LeaderboardPage() {
         )}
 
         {/* Top 3 Podium - Projects */}
-        {leaderboardType === 'projects' && (
+        {leaderboardType === 'projects' && isLoading && (
+          <ProjectsPodiumSkeleton />
+        )}
+        {leaderboardType === 'projects' && !isLoading && projectsData.length > 0 && (
           <ProjectsPodium topThree={projectTopThree} isLoaded={isLoaded} />
+        )}
+        {leaderboardType === 'projects' && !isLoading && projectsData.length === 0 && (
+          <div className={`text-center py-8 transition-colors ${
+            theme === 'dark' ? 'text-[#b8a898]' : 'text-[#7a6b5a]'
+          }`}>
+            No projects yet. Be the first to add a project!
+          </div>
         )}
       </LeaderboardHero>
 
@@ -243,11 +294,23 @@ export function LeaderboardPage() {
 
       {/* Leaderboard Table - Projects */}
       {leaderboardType === 'projects' && (
-        <ProjectsTable
-          data={projectsData}
-          activeFilter={activeFilter}
-          isLoaded={isLoaded}
-        />
+        <>
+          {isLoading ? (
+            <div className={`backdrop-blur-[40px] bg-white/[0.12] rounded-[24px] border border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.08)] p-8 ${theme === 'dark' ? 'text-[#b8a898]' : 'text-[#7a6b5a]'}`}>
+              <div className="text-center">Loading projects...</div>
+            </div>
+          ) : projectsData.length === 0 ? (
+            <div className={`backdrop-blur-[40px] bg-white/[0.12] rounded-[24px] border border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.08)] p-8 text-center ${theme === 'dark' ? 'text-[#b8a898]' : 'text-[#7a6b5a]'}`}>
+              No projects found. Be the first to add a project!
+            </div>
+          ) : (
+            <ProjectsTable
+              data={projectsData}
+              activeFilter={activeFilter}
+              isLoaded={isLoaded}
+            />
+          )}
+        </>
       )}
 
       {/* CSS Animations */}
