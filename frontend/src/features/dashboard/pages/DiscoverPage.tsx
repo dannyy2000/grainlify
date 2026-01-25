@@ -349,9 +349,9 @@ export function DiscoverPage({ onGoToBilling, onGoToOpenSourceWeek }: DiscoverPa
       </div>
 
       {/* Recommended Projects */}
-      <div className={`backdrop-blur-[40px] rounded-[24px] border shadow-[0_8px_32px_rgba(0,0,0,0.08)] p-8 transition-colors ${theme === 'dark'
-          ? 'bg-white/[0.08] border-white/10'
-          : 'bg-white/[0.12] border-white/20'
+      <div className={`backdrop-blur-[40px] rounded-[24px] border shadow-[0_8px_32px_rgba(0,0,0,0.08)] p-6 md:p-8 transition-colors ${theme === 'dark'
+        ? 'bg-white/[0.08] border-white/10'
+        : 'bg-white/[0.12] border-white/20'
         }`}>
         <div className="flex items-center space-x-3 mb-2">
           <Zap className="w-5 h-5 md:w-6 md:h-6 text-[#c9983a] drop-shadow-sm" />
@@ -486,7 +486,8 @@ export function DiscoverPage({ onGoToBilling, onGoToOpenSourceWeek }: DiscoverPa
         {isLoadingIssues ? (
           <div className="flex flex-col md:flex-row gap-4 md:overflow-x-auto pb-2">
             {[...Array(3)].map((_, idx) => (
-              <div key={idx} className={`flex-shrink-0 w-full md:w-[480px] rounded-[16px] border p-6 ${theme === 'dark' ? 'bg-white/[0.08] border-white/15' : 'bg-white/[0.15] border-white/25'}`}>
+              <div key={idx} className={`flex-shrink-0 w-full md:w-[480px] rounded-[16px] border p-6 ${theme === 'dark' ? 'bg-white/[0.08] border-white/15' : 'bg-white/[0.15] border-white/25'
+                }`}>
                 {/* Title with status indicator */}
                 <div className="flex items-start gap-3 mb-3">
                   <SkeletonLoader variant="circle" className="w-5 h-5 flex-shrink-0" />
