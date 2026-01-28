@@ -135,6 +135,9 @@ export function BillingTab() {
   const [isVerifying, setIsVerifying] = useState(false);
   const [kycStatus, setKycStatus] = useState<string | null>(null);
   const [isCheckingKYC, setIsCheckingKYC] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  
+  const [kycWindowOpened, setKycWindowOpened] = useState(false);
 
   const handleCreateProfile = () => {
     if (!profileName.trim()) return;
@@ -185,6 +188,7 @@ export function BillingTab() {
       }
     } catch (error) {
       console.error('Failed to check KYC status:', error);
+      setErrorMessage("VerificationFailed: Connection to the identity server failed. Please try again.");
     } finally {
       setIsCheckingKYC(false);
     }
@@ -214,6 +218,7 @@ export function BillingTab() {
     if (!selectedProfile) return;
 
     setIsVerifying(true);
+    setKycWindowOpened(false);
     try {
       // Start KYC verification
       const response = await startKYCVerification();
@@ -221,6 +226,22 @@ export function BillingTab() {
       // Open the KYC URL in a new window
       if (response.url) {
         window.open(response.url, '_blank', 'width=800,height=600');
+        setErrorMessage("");
+        
+        // Window opened successfully - update state to reflect this
+        if (kycWindow) {
+          setKycWindowOpened(true);
+          setIsVerifying(false); // Stop the "Starting Verification..." state
+          
+          // Immediately check current status
+          try {
+            const initialStatus = await getKYCStatus();
+            setKycStatus(initialStatus.status || 'pending');
+          } catch {
+            // Default to pending if we can't fetch status
+            setKycStatus('pending');
+          }
+        }
 
         // Poll for status updates
         const pollInterval = setInterval(async () => {
@@ -230,28 +251,31 @@ export function BillingTab() {
 
             if (statusResponse.status === 'verified') {
               clearInterval(pollInterval);
-              setIsVerifying(false);
+              setKycWindowOpened(false);
               if (statusResponse.extracted) {
                 updateProfileWithKYCData(statusResponse.extracted);
               }
             } else if (statusResponse.status === 'rejected' || statusResponse.status === 'expired') {
               clearInterval(pollInterval);
-              setIsVerifying(false);
+              setKycWindowOpened(false);
             }
           } catch (error) {
             console.error('Failed to poll KYC status:', error);
+            setErrorMessage("Connection lost. We're having trouble checking your verification status. Please refresh the page.");
           }
         }, 3000); // Poll every 3 seconds
 
         // Stop polling after 5 minutes
         setTimeout(() => {
           clearInterval(pollInterval);
-          setIsVerifying(false);
+          setKycWindowOpened(false);
         }, 5 * 60 * 1000);
       }
     } catch (error) {
       console.error('Failed to start KYC verification:', error);
+      setErrorMessage("Could not start verification. Please try again later.");
       setIsVerifying(false);
+      setKycWindowOpened(false);
     }
   };
 
@@ -321,6 +345,13 @@ export function BillingTab() {
     // Profile Detail View
     return (
       <div className="space-y-6">
+        {errorMessage && (
+                <div className="text-red-500 bg-red-100 p-2 rounded mb-4 border border-red-200">
+                        {errorMessage}
+                              </div>
+                                  )}
+                                  
+        )
         {/* Back Button */}
         <button
           onClick={() => setSelectedProfile(null)}
@@ -583,21 +614,39 @@ export function BillingTab() {
                 <div className="mt-8 flex items-center gap-4">
                   <button
                     onClick={handleVerifyKYC}
-                    disabled={isVerifying || isCheckingKYC}
+                    disabled={isVerifying || isCheckingKYC || kycWindowOpened}
                     className="px-8 py-3 rounded-[16px] bg-gradient-to-br from-[#c9983a] to-[#a67c2e] text-white font-semibold text-[15px] shadow-[0_6px_24px_rgba(162,121,44,0.4)] hover:shadow-[0_8px_28px_rgba(162,121,44,0.5)] transition-all border border-white/10 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                   >
-                    {isVerifying || isCheckingKYC ? (
+                    {isVerifying ? (
                       <>
                         <Loader2 className="w-5 h-5 animate-spin" />
-                        {isVerifying ? 'Starting Verification...' : 'Checking Status...'}
+                        Starting Verification...
+                      </>
+                    ) : isCheckingKYC ? (
+                      <>
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                        Checking Status...
+                      </>
+                    ) : kycWindowOpened ? (
+                      <>
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                        {kycStatus === 'pending' || kycStatus === 'not_started' 
+                          ? 'Verification in Progress...' 
+                          : kycStatus === 'in_review' 
+                            ? 'Under Review...' 
+                            : 'Awaiting Completion...'}
                       </>
                     ) : (
                       'Verify KYC'
                     )}
                   </button>
-                  {isVerifying && (
+                  {(isVerifying || kycWindowOpened) && (
                     <span className={`text-[14px] transition-colors ${theme === 'dark' ? 'text-[#c5b5a2]' : 'text-[#6b5d4d]'
-                      }`}>A new window will open for verification. Please complete the process there.</span>
+                      }`}>
+                      {isVerifying 
+                        ? 'A new window will open for verification. Please complete the process there.'
+                        : 'Please complete the verification in the opened window.'}
+                    </span>
                   )}
                 </div>
               )}
