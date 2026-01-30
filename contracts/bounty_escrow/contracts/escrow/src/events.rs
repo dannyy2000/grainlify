@@ -34,6 +34,7 @@ pub struct FundsLocked {
     pub amount: i128,
     pub depositor: Address,
     pub deadline: u64,
+    pub token_address: Address, // Token used for this lock
 }
 
 pub fn emit_funds_locked(env: &Env, event: FundsLocked) {
@@ -51,6 +52,7 @@ pub struct FundsReleased {
     pub bounty_id: u64,
     pub amount: i128,
     pub recipient: Address,
+    pub token_address: Address, // Token used for this release
     pub timestamp: u64,
     pub remaining_amount: i128,
 }
@@ -73,6 +75,7 @@ pub struct FundsRefunded {
     pub timestamp: u64,
     pub refund_mode: crate::RefundMode,
     pub remaining_amount: i128,
+    pub token_address: Address, // Token used for this refund
 }
 
 pub fn emit_funds_refunded(env: &Env, event: FundsRefunded) {
