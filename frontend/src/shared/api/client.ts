@@ -3,8 +3,8 @@
  * Base URL: http://7nonainmv1.loclx.io
  */
 
-import { API_BASE_URL } from '../config/api';
-import { SearchResults } from '../types/search';
+import { API_BASE_URL } from "../config/api";
+import { SearchResults } from "../types/search";
 
 // Token management
 export const getAuthToken = (): string | null => {
@@ -151,6 +151,10 @@ export type LandingStats = {
 
 export const getLandingStats = () =>
   apiRequest<LandingStats>('/stats/landing');
+
+// Search
+export const search = (query: string) =>
+  apiRequest<SearchResults>(`/search?q=${encodeURIComponent(query)}`);
 
 // Search
 export const search = (query: string) =>

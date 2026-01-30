@@ -18,7 +18,16 @@ pub struct BountyEscrowInitialized {
     pub timestamp: u64,
 }
 
-pub fn emit_bounty_initialized(env: &Env, event: BountyEscrowInitialized) {
+/// Emits a BountyEscrowInitialized event.
+///
+/// # Arguments
+/// * `env` - The contract environment
+/// * `event` - The initialization event data
+///
+/// # Event Structure
+/// Topic: `(symbol_short!("init"),)`
+/// Data: Complete `BountyEscrowInitialized` struct
+pub fn _emit_bounty_initialized(env: &Env, event: BountyEscrowInitialized) {
     let topics = (symbol_short!("init"),);
     env.events().publish(topics, event.clone());
 }
@@ -37,7 +46,19 @@ pub struct FundsLocked {
     pub token_address: Address, // Token used for this lock
 }
 
-pub fn emit_funds_locked(env: &Env, event: FundsLocked) {
+/// Emits a FundsLocked event.
+///
+/// # Arguments
+/// * `env` - The contract environment
+/// * `event` - The funds locked event data
+///
+/// # Event Structure
+/// Topic: `(symbol_short!("f_lock"), event.bounty_id)`
+/// Data: Complete `FundsLocked` struct
+///
+/// # Indexing Note
+/// The bounty_id is included in topics for efficient filtering
+pub fn _emit_funds_locked(env: &Env, event: FundsLocked) {
     let topics = (symbol_short!("f_lock"), event.bounty_id);
     env.events().publish(topics, event.clone());
 }
@@ -57,7 +78,16 @@ pub struct FundsReleased {
     pub remaining_amount: i128,
 }
 
-pub fn emit_funds_released(env: &Env, event: FundsReleased) {
+/// Emits a FundsReleased event.
+///
+/// # Arguments
+/// * `env` - The contract environment
+/// * `event` - The funds released event data
+///
+/// # Event Structure
+/// Topic: `(symbol_short!("f_rel"), event.bounty_id)`
+/// Data: Complete `FundsReleased` struct
+pub fn _emit_funds_released(env: &Env, event: FundsReleased) {
     let topics = (symbol_short!("f_rel"), event.bounty_id);
     env.events().publish(topics, event.clone());
 }
@@ -78,7 +108,16 @@ pub struct FundsRefunded {
     pub token_address: Address, // Token used for this refund
 }
 
-pub fn emit_funds_refunded(env: &Env, event: FundsRefunded) {
+/// Emits a FundsRefunded event.
+///
+/// # Arguments
+/// * `env` - The contract environment
+/// * `event` - The funds refunded event data
+///
+/// # Event Structure
+/// Topic: `(symbol_short!("f_ref"), event.bounty_id)`
+/// Data: Complete `FundsRefunded` struct
+pub fn _emit_funds_refunded(env: &Env, event: FundsRefunded) {
     let topics = (symbol_short!("f_ref"), event.bounty_id);
     env.events().publish(topics, event.clone());
 }
